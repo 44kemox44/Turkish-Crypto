@@ -7,6 +7,7 @@
 #include <cctype>
 #include <clocale>
 #include <stdexcept>
+#include <cmath>
 #include "turkish_crypto.h"
 
 using namespace std;
@@ -31,6 +32,30 @@ using namespace std;
 
 void setTurkish() {
     setlocale(LC_ALL, "Turkish");
+}
+
+int euler_totient(int n) {
+    int result = n; // Start with n
+
+    // Check for each number i from 2 to sqrt(n)
+    for (int i = 2; i <= sqrt(n); i++) {
+        // If i is a factor of n
+        if (n % i == 0) {
+            // If i is a prime factor, divide n by i as long as it's divisible
+            while (n % i == 0) {
+                n /= i;
+            }
+            // Subtract the multiples of the prime factor i
+            result -= result / i;
+        }
+    }
+
+    // If n is still greater than 1, then it must be a prime number
+    if (n > 1) {
+        result -= result / n;
+    }
+
+    return result;
 }
 
 int determinant2x2(vector<vector<int>>& matrix) {
@@ -335,4 +360,127 @@ string hill_decipher(string& encrypted_text, vector<vector<int>> matrix) {
 
     return hill_cipher(encrypted_text, reverse_matrix);
 
+}
+
+//digraph
+string rsa_cipher(string& plain_text, int n, int b) {
+    // Convert all text to lowercase
+    for (int i = 0; i < plain_text.size(); i++) {
+        plain_text[i] = tolower(plain_text[i]);
+    }
+
+    string cipher_text = "";
+    vector<int> block;
+    int result;
+
+    for (int i = 0; i < plain_text.size(); ++i) {
+
+        if (char_to_int.find(plain_text[i]) != char_to_int.end()) {
+            block.push_back(char_to_int[plain_text[i]]);
+        }
+
+        // Check if we have a complete block of 2 characters
+        if (block.size() == 2) {
+
+            int num = block[0] * 29 + block[1]; // Combine two characters into one number
+            result = modPow(num, b, n); // Encrypt the number using RSA
+
+            //cout << num << " num= " << block[0] << " * 29 + " << block[1] << endl;
+            //cout << num << "^" << b << " (mod" << n << ")= " << result << endl;
+
+
+            cipher_text += int_to_char[(result / 29) / 29];
+            cipher_text += int_to_char[(result / 29) % 29];
+            cipher_text += int_to_char[result % 29];
+
+            //cout << "x: " << result/(29*29) << "\ty:" << (result/29) % 29 << "\tz: " << result%29 << endl;
+            cout << "x: " << int_to_char[result/(29*29)] << "\ty:" << int_to_char[(result/29) % 29] << "\tz: " << int_to_char[result%29] << endl;
+
+            // Clear block for the next pair
+            block.clear();
+        }
+    }
+
+    // If there's a leftover character (not paired), handle it as needed
+    if (!block.empty()) {
+        int num = block[0] * 29; // Handle single character case
+        result = modPow(num, b, n);
+
+        //cout << num << " ";
+
+        // Convert the encrypted number back to characters
+        cipher_text += int_to_char[result / 29];
+        cipher_text += int_to_char[result % 29];
+
+        cout << result/29 << "\t" << result%29 << endl;
+    }
+
+    return cipher_text;
+}
+
+string rsa_decipher(string& encrypted_text, int n, int b) {
+    // Calculate the Euler's Totient function
+    int phi = euler_totient(n);
+
+    cout << "Phi: " << phi << endl;
+
+    // Find the modular inverse of b modulo phi
+    int a, temp;
+    extendedGCD(b, phi, a, temp);
+    // Ensure a is positive
+    a = (a % phi + phi) % phi;
+
+    // Convert all text to lowercase (if needed)
+    for (int i = 0; i < encrypted_text.size(); i++) {
+        encrypted_text[i] = tolower(encrypted_text[i]);
+    }
+
+    string plain_text = "";
+    vector<int> block;
+    int result;
+
+    for (int i = 0; i < encrypted_text.size(); ++i) {
+        if (char_to_int.find(encrypted_text[i]) != char_to_int.end()) {
+            block.push_back(char_to_int[encrypted_text[i]]);
+        }
+
+        // Check if we have a complete block of 3 characters
+        if (block.size() == 3) {
+            // Combine three characters into one number
+            int num = block[0] * 29 * 29 + block[1] * 29 + block[2];
+
+            //cout << "num= " << block[0] << "*29*29 + " << block[1] << "*29 + " << block[2] << endl;
+
+            // Decrypt the number using the modular inverse
+            result = modPow(num, a, n);
+
+            //cout << num << "^" << b << " (mod" << n << ")= " << result << endl;
+
+            // Convert the decrypted number back to two characters
+            plain_text += int_to_char[result / 29];
+            plain_text += int_to_char[result % 29];
+
+            cout << int_to_char[block[0]] << int_to_char[block[1]] << int_to_char[block[2]] << endl;
+
+            // Clear block for the next set of characters
+            block.clear();
+        }
+    }
+
+    // Handle any leftover characters
+    if (!block.empty()) {
+        int num = block[0] * 29 * 29; // Handle single character case
+        if (block.size() > 1) {
+            num += block[1] * 29;
+        }
+        result = modPow(num, a, n);
+
+        cout << num << " ";
+
+        // Convert the decrypted number back to characters
+        plain_text += int_to_char[result / 29];
+        plain_text += int_to_char[result % 29];
+    }
+
+    return plain_text;
 }

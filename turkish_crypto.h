@@ -17,6 +17,8 @@ extern unordered_map<int, char> int_to_char;
 
 void setTurkish();
 
+int euler_totient(int n);
+
 int determinant2x2(vector<vector<int>>& matrix);
 
 int modPow(int base, int exp, int mod);
@@ -42,5 +44,9 @@ string vigenere_decipher(string& encrypted_text, string key, bool space_enabled=
 string hill_cipher(string& plain_text, vector<vector<int>>& matrix);
 
 string hill_decipher(string& encrypted_text, vector<vector<int>> matrix);
+
+string rsa_cipher(string& plain_text, int n, int b);
+
+string rsa_decipher(string& encrypted_text, int n, int b);
 
 #endif // TURKISH_CRYPTO_H
