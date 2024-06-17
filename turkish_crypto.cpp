@@ -367,10 +367,19 @@ string hill_cipher(string& plain_text, vector<vector<int>>& matrix) {
         }
     }
 
+
     // If there's a leftover character (not paired), handle it as needed
     if (!block.empty()) {
-        int result = matrix[0][0] * block[0] % 29; // Just an example, adjust as per your matrix size
-        cipher_text += int_to_char[result];
+
+        int result1 = (matrix[0][0] * block[0] + matrix[0][1] * 0) % 29;
+        int result2 = (matrix[1][0] * block[0] + matrix[1][1] * 0) % 29;
+
+        // Convert results back to characters
+        cipher_text += int_to_char[result1];
+        cipher_text += int_to_char[result2];
+
+        //cout << "Result1: " << int_to_char[result1] << endl;
+        //cout << "Result2: " << int_to_char[result2] << endl;
     }
 
     return cipher_text;
@@ -395,10 +404,10 @@ string hill_decipher(string& encrypted_text, vector<vector<int>> matrix) {
             reverse_matrix[i][j] = ( (inverse_k) * reverse_matrix[i][j] ) % 29;
             if(reverse_matrix[i][j] < 0) reverse_matrix[i][j] += 29;
 
-            cout << "[" << i << "]" << "[" << j << "]" << " : " << reverse_matrix[i][j] << "\n";
+            //cout << "[" << i << "]" << "[" << j << "]" << " : " << reverse_matrix[i][j] << "\n";
 
         }
-        cout << " ";
+        //cout << " ";
     }
 
     cout << "Determinant: " << k << endl;
@@ -456,7 +465,8 @@ string rsa_cipher(string& plain_text, int n, int b) {
         //cout << num << " ";
 
         // Convert the encrypted number back to characters
-        cipher_text += int_to_char[result / 29];
+        cipher_text += int_to_char[(result / 29) / 29];
+        cipher_text += int_to_char[(result / 29) % 29];
         cipher_text += int_to_char[result % 29];
 
         cout << result/29 << "\t" << result%29 << endl;

@@ -23,7 +23,7 @@ string to_lower(string text);
 
 string to_upper(string text);
 
-pair<int, int> primeFactorization(int n)
+pair<int, int> primeFactorization(int n);
 
 int euler_totient(int n);
 
