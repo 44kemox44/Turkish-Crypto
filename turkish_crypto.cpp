@@ -8,6 +8,8 @@
 #include <clocale>
 #include <stdexcept>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include "turkish_crypto.h"
 
 using namespace std;
@@ -28,10 +30,70 @@ using namespace std;
         {24, 'u'}, {25, 'ü'}, {26, 'v'}, {27, 'y'}, {28, 'z'}
     };
 
+    unordered_map<char, char> to_lower_map = {
+        {'A', 'a'}, {'B', 'b'}, {'C', 'c'}, {'Ç', 'ç'}, {'D', 'd'}, {'E', 'e'},
+        {'F', 'f'}, {'G', 'g'}, {'Ð', 'ð'}, {'H', 'h'}, {'I', 'ý'}, {'Ý', 'i'},
+        {'J', 'j'}, {'K', 'k'}, {'L', 'l'}, {'M', 'm'}, {'N', 'n'}, {'O', 'o'},
+        {'Ö', 'ö'}, {'P', 'p'}, {'R', 'r'}, {'S', 's'}, {'Þ', 'þ'}, {'T', 't'},
+        {'U', 'u'}, {'Ü', 'ü'}, {'V', 'v'}, {'Y', 'y'}, {'Z', 'z'}
+    };
+
+    unordered_map<char, char> to_upper_map = {
+    {'a', 'A'}, {'b', 'B'}, {'c', 'C'}, {'ç', 'Ç'}, {'d', 'D'}, {'e', 'E'},
+    {'f', 'F'}, {'g', 'G'}, {'ð', 'Ð'}, {'h', 'H'}, {'ý', 'I'}, {'i', 'Ý'},
+    {'j', 'J'}, {'k', 'K'}, {'l', 'L'}, {'m', 'M'}, {'n', 'N'}, {'o', 'O'},
+    {'ö', 'Ö'}, {'p', 'P'}, {'r', 'R'}, {'s', 'S'}, {'þ', 'Þ'}, {'t', 'T'},
+    {'u', 'U'}, {'ü', 'Ü'}, {'v', 'V'}, {'y', 'Y'}, {'z', 'Z'}
+    };
+
 // Function definitions
 
 void setTurkish() {
     setlocale(LC_ALL, "Turkish");
+}
+
+string to_lower(string text) {
+    string result = "";
+
+    for(int i = 0; i < text.size(); i++) {
+        char current_char = text[i];
+        // If the character is in the map, convert it to lowercase
+        if (to_lower_map.find(current_char) != to_lower_map.end()) {
+            result += to_lower_map[current_char];
+        } else {
+            // If the character is not in the map, keep it unchanged
+            result += current_char;
+        }
+    }
+
+    return result;
+}
+
+string to_upper(string text) {
+    string result = "";
+
+    for(int i = 0; i < text.size(); i++) {
+        char current_char = text[i];
+        // If the character is in the map, convert it to uppercase
+        if (to_upper_map.find(current_char) != to_upper_map.end()) {
+            result += to_upper_map[current_char];
+        } else {
+            // If the character is not in the map, keep it unchanged
+            result += current_char;
+        }
+    }
+
+    return result;
+}
+
+pair<int, int> primeFactorization(int n) {
+    for (int p = 2; p * p <= n; ++p) {
+        if (n % p == 0) {
+            int q = n / p;
+            return {p, q};
+        }
+    }
+    return {-1, -1}; // error, n should be a product of two primes
 }
 
 int euler_totient(int n) {
@@ -122,9 +184,7 @@ string substitution_cipher(string& plain_text, unordered_map<char, char>& umap, 
 
     string cipher_text = "";
 
-    for(int i=0; i<plain_text.size(); i++) {
-        plain_text[i] = tolower(plain_text[i]);
-    }
+    plain_text = to_lower(plain_text);
 
     for(auto character : plain_text) {
 
@@ -168,10 +228,7 @@ string affine_cipher(string& plain_text, int a, int b, bool space_enabled) {
 
     string cipher_text = "";
 
-    // Lower all text
-    for(int i=0; i<plain_text.size(); i++) {
-        plain_text[i] = tolower(plain_text[i]);
-    }
+    plain_text = to_lower(plain_text);
 
     // Iterate over each character in the plaintext
     for (char c : plain_text) {
@@ -197,12 +254,9 @@ string affine_cipher(string& plain_text, int a, int b, bool space_enabled) {
 
 string affine_decipher(string& encrypted_text, int a, int b, bool space_enabled) {
 
-
     string plain_text = "";
 
-    for (char &c : encrypted_text) {
-        c = tolower(c);
-    }
+    encrypted_text = to_lower(encrypted_text);
 
     int a_inv = modInverse(a, 29);
 
@@ -221,13 +275,8 @@ string affine_decipher(string& encrypted_text, int a, int b, bool space_enabled)
 
 string vigenere_cipher(string& plain_text, string key, bool space_enabled) {
 
-    // Lower all text
-    for(int i=0; i<plain_text.size(); i++) {
-        plain_text[i] = tolower(plain_text[i]);
-    }
-    for(int i=0; i<key.size(); i++) {
-        key[i] = tolower(key[i]);
-    }
+    plain_text = to_lower(plain_text);
+    key = to_lower(key);
 
     string cipher_text = "";
     int count = 0;
@@ -260,6 +309,8 @@ string vigenere_cipher(string& plain_text, string key, bool space_enabled) {
 
 string vigenere_decipher(string& encrypted_text, string key, bool space_enabled) {
 
+    encrypted_text = to_lower(encrypted_text);
+
     string plain_text = "";
     int count = 0;
 
@@ -290,10 +341,7 @@ string vigenere_decipher(string& encrypted_text, string key, bool space_enabled)
 
 string hill_cipher(string& plain_text, vector<vector<int>>& matrix) {
 
-    // Convert all text to lowercase
-    for(int i = 0; i < plain_text.size(); i++) {
-        plain_text[i] = tolower(plain_text[i]);
-    }
+    plain_text = to_lower(plain_text);
 
     string cipher_text = "";
     vector<int> block;
@@ -364,10 +412,9 @@ string hill_decipher(string& encrypted_text, vector<vector<int>> matrix) {
 
 //digraph
 string rsa_cipher(string& plain_text, int n, int b) {
+
     // Convert all text to lowercase
-    for (int i = 0; i < plain_text.size(); i++) {
-        plain_text[i] = tolower(plain_text[i]);
-    }
+    plain_text = to_lower(plain_text);
 
     string cipher_text = "";
     vector<int> block;
@@ -394,7 +441,7 @@ string rsa_cipher(string& plain_text, int n, int b) {
             cipher_text += int_to_char[result % 29];
 
             //cout << "x: " << result/(29*29) << "\ty:" << (result/29) % 29 << "\tz: " << result%29 << endl;
-            cout << "x: " << int_to_char[result/(29*29)] << "\ty:" << int_to_char[(result/29) % 29] << "\tz: " << int_to_char[result%29] << endl;
+            //cout << "x: " << int_to_char[result/(29*29)] << "\ty:" << int_to_char[(result/29) % 29] << "\tz: " << int_to_char[result%29] << endl;
 
             // Clear block for the next pair
             block.clear();
@@ -431,9 +478,7 @@ string rsa_decipher(string& encrypted_text, int n, int b) {
     a = (a % phi + phi) % phi;
 
     // Convert all text to lowercase (if needed)
-    for (int i = 0; i < encrypted_text.size(); i++) {
-        encrypted_text[i] = tolower(encrypted_text[i]);
-    }
+    encrypted_text = to_lower(encrypted_text);
 
     string plain_text = "";
     vector<int> block;
@@ -460,7 +505,7 @@ string rsa_decipher(string& encrypted_text, int n, int b) {
             plain_text += int_to_char[result / 29];
             plain_text += int_to_char[result % 29];
 
-            cout << int_to_char[block[0]] << int_to_char[block[1]] << int_to_char[block[2]] << endl;
+            //cout << int_to_char[block[0]] << int_to_char[block[1]] << int_to_char[block[2]] << endl;
 
             // Clear block for the next set of characters
             block.clear();
@@ -483,4 +528,109 @@ string rsa_decipher(string& encrypted_text, int n, int b) {
     }
 
     return plain_text;
+}
+
+vector<vector<int>> elgamal_cipher(string& plain_text, int p, int alpha, int a) {
+    int beta = modPow(alpha, a, p);
+    cout << "Beta: " << beta << endl;
+
+    plain_text = to_lower(plain_text);
+
+    vector<vector<int>> encrypted_int;
+    vector<int> block;
+    int y1;
+    int y2;
+
+    // Seed the random number generator for each iteration
+    srand(time(nullptr));
+    // Generate a random k (1 <= k <= p-2)
+    int k = rand() % (p - 2) + 1;
+
+    cout << "K random number: " << k << endl;
+
+    for (int i = 0; i < plain_text.size(); ++i) {
+
+        if (char_to_int.find(plain_text[i]) != char_to_int.end()) {
+            block.push_back(char_to_int[plain_text[i]]);
+        }
+
+        // Check if we have a complete block of 3 characters
+        if (block.size() == 3) {
+
+
+            // Combine three characters into one number
+            int num = block[0] * 29 * 29 + block[1] * 29 + block[2];
+
+            // Encrypt the number using ElGamal
+            y1 = modPow(alpha, k, p);
+            y2 = num * modPow(beta, k, p) % p;
+
+            // Store y1 and y2 in encrypted_int
+            encrypted_int.push_back({y1, y2});
+
+            cout << "y1: " << y1 << " y2: " << y2 << endl;
+
+            // Clear block for the next set of characters
+            block.clear();
+        }
+    }
+
+    // Handle any leftover characters
+    if (!block.empty()) {
+        int num = block[0] * 29 * 29; // Handle single character case
+        if (block.size() > 1) {
+            num += block[1] * 29;
+        }
+
+        // Generate a random k (1 <= k <= p-2) for the leftover characters
+        int k = rand() % (p - 2) + 1;
+
+        y1 = modPow(alpha, k, p);
+        y2 = num * modPow(beta, k, p) % p;
+
+        // Store y1 and y2 in encrypted_int
+        encrypted_int.push_back({y1, y2});
+
+        cout << "y1: " << y1 << " y2: " << y2 << endl;
+    }
+
+    return encrypted_int;
+}
+
+string elgamal_decipher(int y1, int y2, int p, int alpha, int a) {
+
+    string plaintext;
+
+    int inverse_y1;
+    int temp;
+
+    //cout << "y1^(-1): " << inverse_y1 << endl;
+
+    int x = modPow(y1, a, p);
+    //cout << "x= " << y2 << " x (" << y1 << "^" << a << ")^-1" << " mod(" << p << ") )" << endl;
+
+    extendedGCD(x, p, x, temp);
+    if(x<0) x+=p;
+
+    x = (y2 * x) % p;
+
+    //cout << "y1: " << y1 << " y2: " << y2 << endl;
+    //cout << "x: " << "( " << y2 << " * " << x << " ) % " << p << endl;
+
+    int c3 = x % 29;
+    x /= 29;
+    int c2 = x % 29;
+    int c1 = x / 29;
+
+    if (c3 < 0) c3 += 29;
+    if (c2 < 0) c2 += 29;
+    if (c1 < 0) c1 += 29;
+
+    //cout << c3 << "* 29^2 + " << c2 << "* 29^1 + " << c1 << endl;
+
+    plaintext += int_to_char[c1];
+    plaintext += int_to_char[c2];
+    plaintext += int_to_char[c3];
+
+    return plaintext;
 }

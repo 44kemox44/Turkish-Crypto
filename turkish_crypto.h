@@ -14,8 +14,16 @@ using namespace std;
 
 extern unordered_map<char, int> char_to_int;
 extern unordered_map<int, char> int_to_char;
+extern unordered_map<char, char> to_lower_map;
+extern unordered_map<char, char> to_upper_map;
 
 void setTurkish();
+
+string to_lower(string text);
+
+string to_upper(string text);
+
+pair<int, int> primeFactorization(int n)
 
 int euler_totient(int n);
 
@@ -48,5 +56,9 @@ string hill_decipher(string& encrypted_text, vector<vector<int>> matrix);
 string rsa_cipher(string& plain_text, int n, int b);
 
 string rsa_decipher(string& encrypted_text, int n, int b);
+
+vector<vector<int>> elgamal_cipher(string& plain_text, int p, int alpha, int a);
+
+string elgamal_decipher(int y1, int y2, int p, int alpha, int a);
 
 #endif // TURKISH_CRYPTO_H
