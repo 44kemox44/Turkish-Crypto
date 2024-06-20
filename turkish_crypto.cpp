@@ -310,6 +310,7 @@ string vigenere_cipher(string& plain_text, string key, bool space_enabled) {
 string vigenere_decipher(string& encrypted_text, string key, bool space_enabled) {
 
     encrypted_text = to_lower(encrypted_text);
+    key = to_lower(key);
 
     string plain_text = "";
     int count = 0;
@@ -386,6 +387,8 @@ string hill_cipher(string& plain_text, vector<vector<int>>& matrix) {
 }
 
 string hill_decipher(string& encrypted_text, vector<vector<int>> matrix) {
+
+    encrypted_text = to_lower(encrypted_text);
 
     int k = determinant2x2(matrix);
     k = (k % 29);
@@ -476,6 +479,9 @@ string rsa_cipher(string& plain_text, int n, int b) {
 }
 
 string rsa_decipher(string& encrypted_text, int n, int b) {
+
+    encrypted_text = to_lower(encrypted_text);
+
     // Calculate the Euler's Totient function
     int phi = euler_totient(n);
 
@@ -486,6 +492,8 @@ string rsa_decipher(string& encrypted_text, int n, int b) {
     extendedGCD(b, phi, a, temp);
     // Ensure a is positive
     a = (a % phi + phi) % phi;
+
+    cout << "a: " << a << endl;
 
     // Convert all text to lowercase (if needed)
     encrypted_text = to_lower(encrypted_text);
