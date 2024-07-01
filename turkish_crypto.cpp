@@ -287,9 +287,9 @@ string vigenere_cipher(string& plain_text, string key, bool space_enabled) {
             char char_a = plain_text[i];
             char char_key = key[(count%key.size())];
 
-            int num = char_to_int[char_a] - char_to_int[char_key];
+            int num = char_to_int[char_a] + char_to_int[char_key];
 
-            while(num < 0) num += 29;
+            num = num % 29;
 
             //cout << char_a << " - " << char_key << " = " << int_to_char[num] << endl;
 
@@ -321,9 +321,9 @@ string vigenere_decipher(string& encrypted_text, string key, bool space_enabled)
             char char_a = encrypted_text[i];
             char char_key = key[(count%key.size())];
 
-            int num = char_to_int[char_a] + char_to_int[char_key];
+            int num = char_to_int[char_a] - char_to_int[char_key];
 
-            while(num >= 29) num -= 29;
+            while(num < 0) num += 29;
 
             //cout << char_a << " - " << char_key << " = " << int_to_char[num] << endl;
 
